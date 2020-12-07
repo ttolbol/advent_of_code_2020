@@ -1,5 +1,6 @@
 from unittest import TestCase
 from day07.solution import (extract_bag_color,
+                            extract_bag_color_and_number,
                             get_rule,
                             get_rules,
                             invert_rules,
@@ -17,13 +18,13 @@ class TestSolution(TestCase):
                'faded blue bags contain no other bags.\n' \
                'dotted black bags contain no other bags.\n'
     test_rules = {
-        'light red': {'bright white', 'muted yellow'},
-        'dark orange': {'bright white', 'muted yellow'},
-        'bright white': {'shiny gold'},
-        'muted yellow': {'shiny gold', 'faded blue'},
-        'shiny gold': {'dark olive', 'vibrant plum'},
-        'dark olive': {'faded blue', 'dotted black'},
-        'vibrant plum': {'faded blue', 'dotted black'},
+        'light red': {(1, 'bright white'), (2, 'muted yellow')},
+        'dark orange': {(3, 'bright white'), (4, 'muted yellow')},
+        'bright white': {(1, 'shiny gold')},
+        'muted yellow': {(2, 'shiny gold'), (9, 'faded blue')},
+        'shiny gold': {(1, 'dark olive'), (2, 'vibrant plum')},
+        'dark olive': {(3, 'faded blue'), (4, 'dotted black')},
+        'vibrant plum': {(5, 'faded blue'), (6, 'dotted black')},
         'faded blue': set(),
         'dotted black': set()
     }
@@ -38,15 +39,22 @@ class TestSolution(TestCase):
     }
 
     def test_extract_bag_color(self):
-        test_strs = ['1 dark olive bag', '2 vibrant plum bags.']
-        test_res = ['dark olive', 'vibrant plum']
+        test_strs = ['1 dark olive bag', '2 vibrant plum bags.', 'no other bags.\n']
+        test_res = ['dark olive', 'vibrant plum', 'no other']
         for test_str, expected in zip(test_strs, test_res):
             result = extract_bag_color(test_str)
             self.assertEqual(expected, result)
 
+    def test_extract_bag_color_and_number(self):
+        test_strs = ['1 dark olive bag', '2 vibrant plum bags.', 'no other bags.\n']
+        test_res = [(1, 'dark olive'), (2, 'vibrant plum'), 'no other']
+        for test_str, expected in zip(test_strs, test_res):
+            result = extract_bag_color_and_number(test_str)
+            self.assertEqual(expected, result)
+
     def test_get_rule_single(self):
         test_str = 'light red bags contain 1 bright white bag, 2 muted yellow bags.\n'
-        test_rule = ('light red', {'bright white', 'muted yellow'})
+        test_rule = ('light red', {(1, 'bright white'), (2, 'muted yellow')})
         result = get_rule(test_str)
         self.assertEqual(test_rule, result)
 

@@ -2,13 +2,21 @@ import re
 
 
 def extract_bag_color(in_str):
-    return re.sub(r'\d+ | bag(s)?(\.)?', '', in_str)
+    return re.match(r'\d* ?(\w+ \w+)', in_str).group(1)
+
+
+def extract_bag_color_and_number(in_str):
+    match = re.match(r'(\d+) (\w+ \w+)|(\w+ \w+)', in_str)
+    number, color, no_other = match.groups()
+    if no_other:
+        return no_other
+    return int(number), color
 
 
 def get_rule(line):
     key, bags = line.split(' bags contain ')
     parts = bags.strip().split(', ')
-    value = set(extract_bag_color(part) for part in parts)
+    value = set(extract_bag_color_and_number(part) for part in parts)
     value.discard('no other')
     return key, value
 
@@ -21,7 +29,7 @@ def get_rules(in_str):
 def invert_rules(rules):
     inverted = {}
     for key, val in rules.items():
-        for bag_color in val:
+        for _, bag_color in val:
             if bag_color in inverted:
                 inverted[bag_color].add(key)
             else:
