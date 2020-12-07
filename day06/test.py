@@ -8,16 +8,16 @@ class TestSolution(TestCase):
 
     def test_split_groups(self):
         result = split_groups(TestSolution.test_str)
-        self.assertEqual(result, TestSolution.test_groups)
+        self.assertEqual(TestSolution.test_groups, result)
 
     def test_get_answers_anyone(self):
         results = [get_answers_anyone(group) for group in TestSolution.test_groups]
         expected_results = [{'a', 'b', 'c'}, {'a', 'b', 'c'}, {'a', 'b', 'c'}, {'a'}, {'b'}]
         for res, exp in zip(results, expected_results):
-            self.assertEqual(res, exp)
+            self.assertEqual(exp, res)
 
     def test_get_answers_everyone(self):
         results = [get_answers_everyone(group) for group in TestSolution.test_groups]
         expected_results = [{'a', 'b', 'c'}, set(), {'a'}, {'a'}, {'b'}]
         for res, exp in zip(results, expected_results):
-            self.assertEqual(res, exp)
+            self.assertEqual(exp, res)
