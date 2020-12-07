@@ -9,7 +9,7 @@ def extract_bag_color_and_number(in_str):
     match = re.match(r'(\d+) (\w+ \w+)|(\w+ \w+)', in_str)
     number, color, no_other = match.groups()
     if no_other:
-        return no_other
+        return 0, no_other
     return int(number), color
 
 
@@ -17,7 +17,7 @@ def get_rule(line):
     key, bags = line.split(' bags contain ')
     parts = bags.strip().split(', ')
     value = set(extract_bag_color_and_number(part) for part in parts)
-    value.discard('no other')
+    value.discard((0, 'no other'))
     return key, value
 
 

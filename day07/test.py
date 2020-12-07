@@ -47,7 +47,7 @@ class TestSolution(TestCase):
 
     def test_extract_bag_color_and_number(self):
         test_strs = ['1 dark olive bag', '2 vibrant plum bags.', 'no other bags.\n']
-        test_res = [(1, 'dark olive'), (2, 'vibrant plum'), 'no other']
+        test_res = [(1, 'dark olive'), (2, 'vibrant plum'), (0, 'no other')]
         for test_str, expected in zip(test_strs, test_res):
             result = extract_bag_color_and_number(test_str)
             self.assertEqual(expected, result)
