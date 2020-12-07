@@ -4,7 +4,8 @@ from day07.solution import (extract_bag_color,
                             get_rule,
                             get_rules,
                             invert_rules,
-                            get_possible_bag_colors_containing_bag)
+                            get_possible_bag_colors_containing_bag,
+                            count_bags)
 
 
 class TestSolution(TestCase):
@@ -77,3 +78,18 @@ class TestSolution(TestCase):
         result = get_possible_bag_colors_containing_bag(TestSolution.inverted_rules, 'shiny gold')
         expected = {'bright white', 'muted yellow', 'dark orange', 'light red'}
         self.assertSetEqual(expected, result)
+
+    def test_count_bags(self):
+        result = count_bags(TestSolution.test_rules, 'shiny gold')
+        self.assertEqual(result, 33)
+
+    def integration_test(self):
+        example_str = 'shiny gold bags contain 2 dark red bags.\n' \
+                      'dark red bags contain 2 dark orange bags.\n' \
+                      'dark orange bags contain 2 dark yellow bags.\n' \
+                      'dark yellow bags contain 2 dark green bags.\n' \
+                      'dark green bags contain 2 dark blue bags.\n' \
+                      'dark blue bags contain 2 dark violet bags.\n' \
+                      'dark violet bags contain no other bags.\n'
+        rules = get_rules(example_str)
+        self.assertEqual(count_bags(rules, 'shiny gold') - 1, 126)

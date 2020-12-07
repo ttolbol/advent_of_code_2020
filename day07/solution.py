@@ -49,6 +49,10 @@ def get_possible_bag_colors_containing_bag(inv_rules, bag):
     return bag_colors
 
 
+def count_bags(rules, bag, number_of_bags=1):
+    return number_of_bags + number_of_bags * sum(count_bags(rules, child_bag, n) for n, child_bag in rules[bag])
+
+
 if __name__ == '__main__':
     with open('input.txt') as f:
         data = f.read()
@@ -56,3 +60,4 @@ if __name__ == '__main__':
     inverted_rules = invert_rules(rules)
     part1 = get_possible_bag_colors_containing_bag(inverted_rules, 'shiny gold')
     print(len(part1))
+    print(count_bags(rules, 'shiny gold') - 1)
