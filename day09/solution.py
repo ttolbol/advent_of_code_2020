@@ -1,6 +1,3 @@
-import random
-
-
 def load_numbers(in_str):
     return [int(num) for num in in_str.splitlines()]
 
