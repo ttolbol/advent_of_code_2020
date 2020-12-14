@@ -55,7 +55,7 @@ def make_runnable(instructions):
 if __name__ == '__main__':
     with open('input.txt') as f:
         data = f.read()
-    instructions = [parse_instruction(part) for part in data.split('\n') if part]
+    instructions = [parse_instruction(part) for part in data.splitlines()]
     pc, acc, _ = detect_loop(instructions)
     print(acc)  # part 1
     print(make_runnable(instructions))

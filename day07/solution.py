@@ -22,7 +22,7 @@ def get_rule(line):
 
 
 def get_rules(in_str):
-    lines = [line for line in in_str.split('\n') if line]
+    lines = [line for line in in_str.splitlines()]
     return dict(get_rule(line) for line in lines)
 
 
