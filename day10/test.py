@@ -1,5 +1,5 @@
 from unittest import TestCase
-from day10.solution import load_numbers_sorted, differences, frequency
+from day10.solution import load_numbers_sorted, differences, frequency, count_combinations
 
 
 class TestSolution(TestCase):
@@ -14,3 +14,6 @@ class TestSolution(TestCase):
 
     def test_frequency(self):
         self.assertEqual({1: 3, 2: 2, 3: 1}, frequency([1, 1, 2, 1, 3, 2]))
+
+    def test_count_combinations(self):
+        self.assertEqual(8, count_combinations(TestSolution.test_num))
