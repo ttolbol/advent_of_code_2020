@@ -22,8 +22,8 @@ class Ship:
         elif cmd == 'R':
             self.direction -= val
         elif cmd == 'F':
-            self.x += int(cos(radians(self.direction)) * val)
-            self.y += int(sin(radians(self.direction)) * val)
+            self.x += int(round(cos(radians(self.direction)) * val))
+            self.y += int(round(sin(radians(self.direction)) * val))
 
 
 class Waypoint:
@@ -47,8 +47,8 @@ class Waypoint:
             rad = radians(val)
             if cmd == 'R':
                 rad = -rad
-            wx = int(self.wx * cos(rad) - self.wy * sin(rad))
-            wy = int(self.wx * sin(rad) + self.wy * cos(rad))
+            wx = int(round(self.wx * cos(rad) - self.wy * sin(rad)))
+            wy = int(round(self.wx * sin(rad) + self.wy * cos(rad)))
             self.wx = wx
             self.wy = wy
         elif cmd == 'F':
