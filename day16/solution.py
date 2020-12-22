@@ -71,25 +71,25 @@ def find_ticket_fields(tickets, ruleset):
             for field in list(ticket_fields[field_i]):
                 rule = ruleset[field]
                 if not check_field(num, rule):
-                    print(f'removing "{field}" from field {field_i} because {num} is not in range {rule[0]}-{rule[1]} or {rule[2]}-{rule[3]}')
+                    # print(f'removing "{field}" from field {field_i} because {num} is not in range {rule[0]}-{rule[1]} or {rule[2]}-{rule[3]}')
                     ticket_fields[field_i].remove(field)
 
     # second pass, remove all known fields from other options
     new_known_fields = set()
     for field_set in ticket_fields:
-        if len(field_set) == 1:
-            new_known_fields.update(field_set)
-    while new_known_fields:
+        if len(field_set) == 1:  # this field is known as there is only one option that fits
+            new_known_fields.update(field_set)  # add it to the set of known fields
+    while new_known_fields:  # as long as we have some new information about known fields we do...
         known_fields = new_known_fields
         new_known_fields = set()
         for field_set in ticket_fields:
-            if len(field_set) > 1:
-                field_set.difference_update(known_fields)
-                if len(field_set) == 1:
+            if len(field_set) > 1:  # if there is more than one option then this is not a known field
+                field_set.difference_update(known_fields)  # remove any fields that are already known
+                if len(field_set) == 1:  # if this field is now known add it to the set of known fields
                     new_known_fields.update(field_set)
 
-    if all(len(field_set) == 1 for field_set in ticket_fields):
-        return [field_set.pop() for field_set in ticket_fields]
+    if all(len(field_set) == 1 for field_set in ticket_fields):  # all fields should now be known
+        return [field_set.pop() for field_set in ticket_fields]  # so we can convert the sets to single values
 
     raise ValueError('Failed to find distinct sequence of fields.')
 
