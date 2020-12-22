@@ -1,11 +1,29 @@
+from itertools import product
+
+
 def apply_mask(string, mask):
     masked_string = ''
-    for val, mask in zip(string, mask):
-        if mask == 'X':
+    for val, mask_char in zip(string, mask):
+        if mask_char == 'X':
             masked_string = masked_string + val
         else:
-            masked_string = masked_string + mask
+            masked_string = masked_string + mask_char
     return masked_string
+
+
+def apply_mask_floating(string, mask):
+    masked_string = ''
+    n_floating = 0
+    for val, mask_char in zip(string, mask):
+        if mask_char == 'X':
+            masked_string = masked_string + '{}'
+            n_floating += 1
+        elif mask_char == '0':
+            masked_string = masked_string + val
+        else:
+            masked_string = masked_string + '1'
+
+    return [masked_string.format(*comb) for comb in product('01', repeat=n_floating)]
 
 
 def int2bin(val):
@@ -37,12 +55,24 @@ class CPU:
             self.set_mask(val)
 
 
+class CPUv2(CPU):
+    def write(self, address, value):
+        for address in apply_mask_floating(int2bin(address), self.mask):
+            self.memory[int(address, 2)] = value
+
+
 if __name__ == '__main__':
     with open('input.txt') as f:
         instructions = [line for line in f.readlines()]
 
+    # part 1
     cpu = CPU()
+    for instruction in instructions:
+        cpu.execute(instruction)
+    print(cpu.memory_sum())
 
+    # part 2
+    cpu = CPUv2()
     for instruction in instructions:
         cpu.execute(instruction)
     print(cpu.memory_sum())
