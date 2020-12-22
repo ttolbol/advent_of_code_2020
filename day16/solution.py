@@ -65,19 +65,32 @@ def get_valid_tickets(tickets, ruleset):
 
 def find_ticket_fields(tickets, ruleset):
     ticket_fields = [set(ruleset.keys()) for _ in tickets[0]]
+    # first pass, process of elimination
     for ticket in tickets:
         for field_i, num in enumerate(ticket):
             for field in list(ticket_fields[field_i]):
                 rule = ruleset[field]
                 if not check_field(num, rule):
+                    print(f'removing "{field}" from field {field_i} because {num} is not in range {rule[0]}-{rule[1]} or {rule[2]}-{rule[3]}')
                     ticket_fields[field_i].remove(field)
-            if len(ticket_fields[field_i]) == 1:
-                for i, other_field in enumerate(ticket_fields):
-                    if i != field_i:
-                        other_field.difference_update(ticket_fields[field_i])
-        if all(len(ticket_field) == 1 for ticket_field in ticket_fields):
-            return [ticket_field.pop() for ticket_field in ticket_fields]
-    print(ticket_fields)
+
+    # second pass, remove all known fields from other options
+    new_known_fields = set()
+    for field_set in ticket_fields:
+        if len(field_set) == 1:
+            new_known_fields.update(field_set)
+    while new_known_fields:
+        known_fields = new_known_fields
+        new_known_fields = set()
+        for field_set in ticket_fields:
+            if len(field_set) > 1:
+                field_set.difference_update(known_fields)
+                if len(field_set) == 1:
+                    new_known_fields.update(field_set)
+
+    if all(len(field_set) == 1 for field_set in ticket_fields):
+        return [field_set.pop() for field_set in ticket_fields]
+
     raise ValueError('Failed to find distinct sequence of fields.')
 
 

@@ -20,6 +20,7 @@ test_ruleset = {
     'seat': (13, 40, 45, 50)
 }
 test_tickets = [[7, 1, 14], [7, 3, 47], [40, 4, 50], [55, 2, 20], [38, 6, 12]]
+test_tickets_valid = [[7, 1, 14], [7, 3, 47]]
 test_fields = ['row', 'class', 'seat']
 
 
@@ -61,11 +62,10 @@ class TestSolution(TestCase):
         self.assertEqual(71, find_ticket_scanning_error_rate(test_tickets, test_ruleset))
 
     def test_get_valid_tickets(self):
-        valid_tickets = [[7, 1, 14], [7, 3, 47]]
-        self.assertListEqual(valid_tickets, get_valid_tickets(test_tickets, test_ruleset))
+        self.assertListEqual(test_tickets_valid, get_valid_tickets(test_tickets, test_ruleset))
 
     def test_find_ticket_fields(self):
-        self.assertListEqual(test_fields, find_ticket_fields(test_tickets, test_ruleset))
+        self.assertListEqual(test_fields, find_ticket_fields(test_tickets_valid, test_ruleset))
 
     def test_field_product(self):
         test_fields_departure = ['departure row', 'class', 'departure seat']
