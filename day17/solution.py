@@ -50,3 +50,9 @@ if __name__ == '__main__':
     for _ in range(6):
         cubes_4d = evolve(cubes_4d, count_neighbors(cubes_4d, dim=4))
     print(len(cubes_4d))
+
+    # part 3
+    cubes_4d = load_cubes(lines, dim=5)
+    for _ in range(6):
+        cubes_4d = evolve(cubes_4d, count_neighbors(cubes_4d, dim=5))
+    print(len(cubes_4d))
