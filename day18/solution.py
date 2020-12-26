@@ -1,43 +1,52 @@
-from collections import deque
-
-class Expression:
-    def __init__(self):
-        self.left = None
-        self.right = None
-        self.operator = ''
-
-    def value(self):
-        if isinstance(self.left, Expression):
-            val_left = self.left.value()
+def shunting_yard(infix_str):
+    operator_stack = []
+    out = ''
+    for token in infix_str:
+        if token == ' ':  # ignore spaces
+            continue
+        if token == '+' or token == '*':
+            while operator_stack and operator_stack[-1] != '(':
+                out += operator_stack.pop()
+            operator_stack.append(token)
+        elif token == '(':
+            operator_stack.append(token)
+        elif token == ')':
+            while operator_stack:
+                popped = operator_stack.pop()
+                if popped == '(':
+                    break
+                out += popped
         else:
-            val_left = self.left
+            out += token
 
-        if isinstance(self.right, Expression):
-            val_right = self.right.value()
+    while operator_stack:
+        popped = operator_stack.pop()
+        if popped == '(' or popped == ')':
+            raise ValueError('Mismatched parenthesis in expression')
+        out += popped
+
+    return out
+
+
+def evaluate_rpn(postfix_str):
+    operands = []
+    for token in postfix_str:
+        if token == '+':
+            left = operands.pop()
+            right = operands.pop()
+            operands.append(left + right)
+        elif token == '*':
+            left = operands.pop()
+            right = operands.pop()
+            operands.append(left * right)
         else:
-            val_right = self.right
-
-        if self.operator == '+':
-            return val_left + val_right
-        elif self.operator == '*':
-            return val_left * val_right
-        raise ValueError(f'Unknown operator "{self.operator}"')
-
-    def __eq__(self, other):
-        if not isinstance(other, Expression):
-            return False
-        if self.left != other.left:
-            return False
-        if self.right != other.right:
-            return False
-        if self.operator != other.operator:
-            return False
-        return True
+            operands.append(int(token))
+    return operands.pop()
 
 
 if __name__ == '__main__':
     with open('input.txt') as f:
-        lines = [line for line in f.readlines()]
+        lines = [line.strip() for line in f.readlines() if line]
 
-    print(sum(generate_expression(line).value() for line in lines))
+    print(sum(evaluate_rpn(shunting_yard(line)) for line in lines))
 
