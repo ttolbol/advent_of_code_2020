@@ -1,11 +1,14 @@
-def shunting_yard(infix_str):
+def shunting_yard(infix_str, operator_precedence=None):
+    if operator_precedence is None:
+        operator_precedence = {'+': 1, '*': 1}
     operator_stack = []
     out = ''
     for token in infix_str:
         if token == ' ':  # ignore spaces
             continue
         if token == '+' or token == '*':
-            while operator_stack and operator_stack[-1] != '(':
+            while operator_stack and operator_stack[-1] != '(' and \
+                    operator_precedence[token] <= operator_precedence[operator_stack[-1]]:
                 out += operator_stack.pop()
             operator_stack.append(token)
         elif token == '(':
@@ -48,5 +51,9 @@ if __name__ == '__main__':
     with open('input.txt') as f:
         lines = [line.strip() for line in f.readlines() if line]
 
+    # part 1
     print(sum(evaluate_rpn(shunting_yard(line)) for line in lines))
 
+    # part 2
+    operator_precedence = {'+': 2, '*': 1}
+    print(sum(evaluate_rpn(shunting_yard(line, operator_precedence)) for line in lines))
