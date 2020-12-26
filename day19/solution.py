@@ -26,12 +26,18 @@ def get_message(lines):
     return [line.strip() for line in lines if line[0] == 'a' or line[0] == 'b']
 
 
-def build_pattern(ruleset, key=0):
+def build_pattern(ruleset, key=0, recursion_depth=0):
+    recursion_limit = 20
     if isinstance(ruleset[key], str):
         return list(ruleset[key])[0]
 
-    pattern = '|'.join(''.join(build_pattern(ruleset, key=key) for key in rule) for rule in ruleset[key])
-    return '(' + pattern + ')'
+    options = []
+    for rule in ruleset[key]:
+        if recursion_depth > recursion_limit and key in rule:  # skip recursive rules when past the recursion limit
+            continue
+        option = ''.join(build_pattern(ruleset, key=key, recursion_depth=recursion_depth+1) for key in rule)
+        options.append(option)
+    return '(' + '|'.join(options) + ')'
 
 
 def match_pattern(pattern, message):
@@ -45,6 +51,13 @@ if __name__ == '__main__':
         lines = [line for line in f.readlines()]
 
     # part 1
-    pattern = build_pattern(build_ruleset(lines))
+    ruleset = build_ruleset(lines)
+    pattern = build_pattern(ruleset)
     messages = get_message(lines)
+    print(sum(match_pattern(pattern, msg) for msg in messages))
+
+    # part 2
+    ruleset[8] = get_rule('42 | 42 8')
+    ruleset[11] = get_rule('42 31 | 42 11 31')
+    pattern = build_pattern(ruleset)
     print(sum(match_pattern(pattern, msg) for msg in messages))
