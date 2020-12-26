@@ -1,6 +1,5 @@
 from unittest import TestCase
-from day17.solution import get_neighbor_coords, count_neighbors, evolve, load_cubes
-from collections import defaultdict
+from day17.solution import get_neighbor_coords, load_cubes
 
 
 with open('day17/test_input.txt') as f:
@@ -8,6 +7,7 @@ with open('day17/test_input.txt') as f:
 
 test_cubes_3d = {(1, 0, 0), (2, 1, 0), (0, 2, 0), (1, 2, 0), (2, 2, 0)}
 test_cubes_4d = {(1, 0, 0, 0), (2, 1, 0, 0), (0, 2, 0, 0), (1, 2, 0, 0), (2, 2, 0, 0)}
+
 
 class TestSolution(TestCase):
     def test_load_cubes_3d(self):
