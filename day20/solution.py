@@ -2,7 +2,6 @@ import re
 from collections import defaultdict, deque
 from itertools import product
 from math import sqrt
-from random import shuffle
 
 
 def load_tiles(lines):
@@ -56,37 +55,53 @@ class Tile:
             return False
         return True
 
-    # def get_tile(self):
-    #     if self.flipped_y:
-    #         new_tile = [row for row in reversed(self.tile)]
-    #     else:
-    #         new_tile = [row for row in self.tile]
-    #
-    #     if self.flipped_x:
-    #         for i, row in new_tile:
-    #             new_tile[i] = ''.join(reversed(row))
-    #
-    #     # TODO rotate
-    #     return new_tile
-
 
 class TileMap:
     directions = ((0, 1), (1, 0), (0, -1), (-1, 0))
 
-    def __init__(self, start_tile):
-        self.n_tiles = 1
+    def __init__(self, tiles):
+        tile_edges = defaultdict(deque)
+        for tile in tiles:
+            tile_edges[sum(find_matched_edges(tile, tiles))].append(tile)
+
+        corner_tiles = tile_edges[2]
+        edge_tiles = tile_edges[3]
+        center_tiles = tile_edges[4]
+        start_tile = corner_tiles.popleft()
+        border_tiles = corner_tiles + edge_tiles
+
+        # rotate start tile to align with lower left corner
+        while find_matched_edges(start_tile, tiles) != (True, True, False, False):
+            start_tile.rotation = (start_tile.rotation + 1) % 4
+
+        self.size = int(sqrt(len(tiles)))
         self.tiles = {(0, 0): start_tile}
-        self.free_coords = set(self.directions)
+        self.free_coords = {self.directions[0]}
+
+        for tile_queue in (border_tiles, center_tiles):
+            while tile_queue:
+                tile = tile_queue.popleft()
+                success = False
+                for coord, rotation, fx, fy in product(self.free_coords, range(4), (True, False), (True, False)):
+                    tile.rotation = rotation
+                    tile.flip_x = fx
+                    tile.flip_y = fy
+                    if self.check_if_tile_fits(tile, coord):
+                        self.add_tile(tile, coord)
+                        success = True
+                        break
+                if not success and tile_queue:
+                    tile_queue.append(tile)
+                print(f'Found {len(self.tiles)} of {len(tiles)} tiles. {len(tile_queue)} left in queue')
 
     def check_if_tile_fits(self, tile, coord):
-        if coord not in self.free_coords:
+        if coord in self.tiles:
             return False
         for edge_num, direction in enumerate(self.directions):
             x = coord[0] + direction[0]
             y = coord[1] + direction[1]
-            if (x, y) in self.tiles:
-                if tile.get_edge(edge_num) != self.tiles[(x, y)].get_edge(edge_num + 2):
-                    return False
+            if (x, y) in self.tiles and tile.get_edge(edge_num) != self.tiles[(x, y)].get_edge(edge_num + 2):
+                return False
         return True
 
     def add_tile(self, tile, coord):
@@ -95,25 +110,16 @@ class TileMap:
         for direction in self.directions:
             x = coord[0] + direction[0]
             y = coord[1] + direction[1]
-            if (x, y) not in self.tiles:
+            if 0 <= x < self.size and 0 <= y < self.size and (x, y) not in self.tiles:
                 self.free_coords.add((x, y))
 
-    def get_start_coords(self):
-        x = 0
-        y = 0
-        while (x - 1, y) in self.tiles:
-            x -= 1
-        while (x, y - 1) in self.tiles:
-            y -= 1
-        return x, y
 
-
-def is_corner(tile, tiles):
+def find_matched_edges(tile, tiles):
     matched = defaultdict(bool)
-    for tile_id in tiles.keys():
-        if tile_id == tile.id:
+    for tile_test in tiles:
+        if tile.id == tile_test.id:
             continue
-        tile_test = tiles[tile_id]
+        tile_config = tile_test.rotation, tile_test.flip_x, tile_test.flip_y
         for direction, rotation, fx, fy in product(range(4), range(4), (True, False), (True, False)):
             tile_test.rotation = rotation
             tile_test.flip_x = fx
@@ -123,32 +129,8 @@ def is_corner(tile, tiles):
             if tile.get_edge(direction) == tile_test.get_edge(direction + 2):
                 matched[direction] = True
                 break
-        if sum(matched.values()) > 2:
-            return False
-    return True
-
-
-def construct_tilemap(tiles):
-    tile_id_queue = deque(tiles.keys())
-    shuffle(tile_id_queue)
-    tm = TileMap(tiles[tile_id_queue.popleft()])
-    while tile_id_queue:
-        print(f'Found {len(tm.tiles)} of {len(tiles)} tiles. ')
-        success = False
-        tile_id = tile_id_queue.popleft()
-        tile = tiles[tile_id]
-        for coord, rotation, fx, fy in product(tm.free_coords, range(4), (True, False), (True, False)):
-            tile.rotation = rotation
-            tile.flip_x = fx
-            tile.flip_y = fy
-            if tm.check_if_tile_fits(tile, coord):
-                tm.add_tile(tile, coord)
-                success = True
-                break
-        if not success:
-            tile_id_queue.append(tile_id)
-    print(f'Found {len(tm.tiles)} of {len(tiles)} tiles. ')
-    return tm
+        tile_test.rotation, tile_test.flip_x, tile_test.flip_y = tile_config
+    return tuple(matched[i] for i in range(4))
 
 
 if __name__ == '__main__':
@@ -157,10 +139,12 @@ if __name__ == '__main__':
 
     # part 1
     tiles = load_tiles(lines)
-    result = 1
-    for tile_id in tiles:
-        tile = tiles[tile_id]
-        if is_corner(tile, tiles):
-            result *= tile_id
+    tm = TileMap(tiles.values())
+    result = tm.tiles[(0, 0)].id
+    result *= tm.tiles[(tm.size - 1, 0)].id
+    result *= tm.tiles[(0, tm.size - 1)].id
+    result *= tm.tiles[(tm.size - 1, tm.size - 1)].id
     print(result)
+
+    # part 2
 
