@@ -108,6 +108,26 @@ class TileMap:
         return x, y
 
 
+def is_corner(tile, tiles):
+    matched = defaultdict(bool)
+    for tile_id in tiles.keys():
+        if tile_id == tile.id:
+            continue
+        tile_test = tiles[tile_id]
+        for direction, rotation, fx, fy in product(range(4), range(4), (True, False), (True, False)):
+            tile_test.rotation = rotation
+            tile_test.flip_x = fx
+            tile_test.flip_y = fy
+            if matched[direction]:
+                continue
+            if tile.get_edge(direction) == tile_test.get_edge(direction + 2):
+                matched[direction] = True
+                break
+        if sum(matched.values()) > 2:
+            return False
+    return True
+
+
 def construct_tilemap(tiles):
     tile_id_queue = deque(tiles.keys())
     shuffle(tile_id_queue)
@@ -137,10 +157,10 @@ if __name__ == '__main__':
 
     # part 1
     tiles = load_tiles(lines)
-    tm = construct_tilemap(tiles)
-    x, y = tm.get_start_coords()
-    w = int(sqrt(len(tiles.keys())))
-    print(w)
-    result = tm.tiles[(x, y)].id * tm.tiles[(x + w, y)].id * tm.tiles[(x, y + w)].id * tm.tiles[(x + w, y + w)].id
+    result = 1
+    for tile_id in tiles:
+        tile = tiles[tile_id]
+        if is_corner(tile, tiles):
+            result *= tile_id
     print(result)
 
