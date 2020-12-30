@@ -1,5 +1,5 @@
 from unittest import TestCase
-from day20.solution import load_tiles, Tile, find_matched_edges, TileMap
+from day20.solution import load_tiles, Tile, find_matched_edges, TileMap, find_corner_and_edge_tiles
 
 with open('day20/test_input.txt') as f:
     test_lines = [line for line in f.readlines()]
@@ -58,7 +58,6 @@ class TestSolution(TestCase):
         tile.flip_y = True
         self.assertEqual(test_edges_flip_xy[1], tile.get_edge(0))
 
-
     def test_get_edge(self):
         tile = Tile(2311, test_tile)
         for i, edge in enumerate(test_edges):
@@ -109,10 +108,18 @@ class TestSolution(TestCase):
         for tile_id, edges in matched_edges.items():
             self.assertEqual(edges, sum(find_matched_edges(tiles[tile_id], tiles.values())))
 
+    def test_find_corner_and_edge_tiles(self):
+        tiles = load_tiles(test_lines)
+        corner_tiles, edge_tiles, center_tiles = find_corner_and_edge_tiles(tiles.values())
+        corner_tiles = set(tile.id for tile in corner_tiles)
+        edge_tiles = set(tile.id for tile in edge_tiles)
+        center_tiles = set(tile.id for tile in center_tiles)
+        self.assertSetEqual({1951, 3079, 2971, 1171}, corner_tiles)
+        self.assertSetEqual({2311, 2473, 2729, 1489}, edge_tiles)
+        self.assertSetEqual({1427}, center_tiles)
+
     def test_tilemap(self):
         tiles = load_tiles(test_lines)
         tm = TileMap(tiles.values())
-        for key, val in tm.tiles.items():
-            print(f'{key}: {val.id}')
         result = tm.tiles[(0, 0)].id * tm.tiles[(0, 2)].id * tm.tiles[(2, 0)].id * tm.tiles[(2, 2)].id
         self.assertEqual(result, 20899048083289)
