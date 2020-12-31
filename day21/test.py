@@ -1,5 +1,8 @@
 from unittest import TestCase
-from day21.solution import get_ingredients_and_allergens, map_allergens_to_foods, find_allergen_free_ingredients
+from day21.solution import (get_ingredients_and_allergens,
+                            map_allergens_to_foods,
+                            find_allergen_free_ingredients,
+                            find_allergens)
 
 with open('day21/test_input.txt') as f:
     test_lines = [line for line in f.readlines()]
@@ -11,6 +14,7 @@ test_ingredients_and_allergens = [({'mxmxvkd', 'kfcds', 'sqjhc', 'nhms'}, {'dair
 test_allergen_food_mapping = {'dairy': (0, 1),
                               'fish': (0, 3),
                               'soy': (2, )}
+test_allergen_free_ingredients = {'kfcds', 'nhms', 'sbzzf', 'trh'}
 
 
 class TestSolution(TestCase):
@@ -27,5 +31,15 @@ class TestSolution(TestCase):
 
     def test_find_allergen_free_ingredients(self):
         result = find_allergen_free_ingredients(test_ingredients_and_allergens, test_allergen_food_mapping)
-        expected = {'kfcds', 'nhms', 'sbzzf', 'trh'}
-        self.assertSetEqual(expected, result)
+        self.assertSetEqual(test_allergen_free_ingredients, result)
+
+    def test_find_allergens(self):
+        result = find_allergens(test_ingredients_and_allergens,
+                                test_allergen_free_ingredients,
+                                test_allergen_food_mapping)
+        expected = {
+            'dairy': 'mxmxvkd',
+            'fish': 'sqjhc',
+            'soy': 'fvjkl',
+        }
+        self.assertDictEqual(expected, result)
